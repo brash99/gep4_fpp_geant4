@@ -14,6 +14,12 @@ RunAction::RunAction(std::string outputPath) : outputPath_(std::move(outputPath)
   out->CreateNtupleIColumn("charged_secondaries");
   out->CreateNtupleIColumn("primary_chamber_mask");
   out->CreateNtupleIColumn("secondary_chamber_mask");
+  out->CreateNtupleIColumn("process_category");
+  out->CreateNtupleDColumn("theta_deg");
+  out->CreateNtupleDColumn("outgoing_p_GeV");
+  out->CreateNtupleIColumn("best_track_chamber_mask");
+  out->CreateNtupleIColumn("same_track_front_pair");
+  out->CreateNtupleIColumn("same_track_rear_pair");
   out->FinishNtuple();
 }
 

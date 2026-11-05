@@ -6,6 +6,8 @@
 #include "G4Track.hh"
 #include "G4VProcess.hh"
 
+#include <algorithm>
+#include <cmath>
 #include <string>
 
 void SteppingAction::UserSteppingAction(const G4Step* step) {
@@ -24,8 +26,19 @@ void SteppingAction::UserSteppingAction(const G4Step* step) {
     for (const auto* secondary : *step->GetSecondaryInCurrentStep()) {
       if (secondary->GetDefinition()->GetPDGCharge() != 0.) ++charged;
     }
-    eventAction_->recordHadronicInteraction(preName == "Analyzer1" ? 1 : 2,
-                                            post->GetPosition().z() / cm, charged);
+    const auto processName = process->GetProcessName();
+    int processCategory = 3;
+    if (processName == "hadElastic") processCategory = 1;
+    else if (processName.find("Inelastic") != std::string::npos) processCategory = 2;
+
+    const auto incoming = pre->GetMomentumDirection();
+    const auto outgoing = post->GetMomentumDirection();
+    const double cosine = std::max(-1.0, std::min(1.0, incoming.dot(outgoing)));
+    const double thetaDeg = std::acos(cosine) / deg;
+    eventAction_->recordHadronicInteraction(
+        preName == "Analyzer1" ? 1 : 2, processCategory,
+        post->GetPosition().z() / cm, thetaDeg, post->GetMomentum().mag() / GeV,
+        charged);
   }
 
   if (!postVolume || post->GetStepStatus() != fGeomBoundary ||

@@ -20,8 +20,8 @@ idealized FPP tracking planes.
 - CSV input for weighted proton phase space.
 - `FTFP_BERT` hadronic physics by default.
 - Idealized FPP tracking planes.
-- ROOT ntuple containing incident kinematics, first hadronic interaction, and
-  charged-track chamber masks.
+- ROOT ntuple containing incident kinematics, first hadronic interaction,
+  scattering angle, outgoing momentum, and per-track chamber-pair acceptance.
 
 The current output is a transport-validation product, not yet a final FOM.
 Analyzing power will be applied outside GEANT4 after defining and validating
@@ -56,6 +56,17 @@ Run explicitly with:
 
 An optional fourth argument selects a Geant4 reference physics list, for
 example `QGSP_BERT`.
+
+Summarize the weighted geometry-level efficiency for a chosen useful angular
+range with:
+
+```bash
+python3 analysis/summarize_efficiency.py output.root --theta-min 5 --theta-max 30
+```
+
+The reported statistical uncertainty is only a weighted-sample diagnostic.
+Hadronic-model, geometry, reconstruction, and analyzing-power uncertainties
+must be evaluated separately.
 
 ## Validation plan
 
