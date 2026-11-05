@@ -68,6 +68,19 @@ The reported statistical uncertainty is only a weighted-sample diagnostic.
 Hadronic-model, geometry, reconstruction, and analyzing-power uncertainties
 must be evaluated separately.
 
+## Monoenergetic validation sample
+
+Generate a deterministic central-ray sample with:
+
+```bash
+python3 scripts/generate_mono_sample.py events.csv \
+  --events 100000 --momentum 6.7
+```
+
+Optional Gaussian position and projected-angle widths support controlled
+acceptance scans. The committed Slurm job `jobs/run_mono_6p7.slurm` runs the
+first 100,000-event central-ray benchmark used for GEANT3/GEANT4 closure.
+
 ## Validation plan
 
 1. Close the geometry against the GEp-III source and survey.
