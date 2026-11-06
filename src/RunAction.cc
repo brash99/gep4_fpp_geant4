@@ -20,6 +20,18 @@ RunAction::RunAction(std::string outputPath) : outputPath_(std::move(outputPath)
   out->CreateNtupleIColumn("best_track_chamber_mask");
   out->CreateNtupleIColumn("same_track_front_pair");
   out->CreateNtupleIColumn("same_track_rear_pair");
+  out->CreateNtupleDColumn("front_track_theta_deg");
+  out->CreateNtupleDColumn("front_track_p_GeV");
+  out->CreateNtupleIColumn("front_track_valid");
+  out->CreateNtupleDColumn("rear_track_theta_deg");
+  out->CreateNtupleDColumn("rear_track_p_GeV");
+  out->CreateNtupleIColumn("rear_track_valid");
+  out->CreateNtupleDColumn("front_zclose_cm");
+  out->CreateNtupleDColumn("front_sclose_cm");
+  out->CreateNtupleDColumn("rear_zclose_cm");
+  out->CreateNtupleDColumn("rear_sclose_cm");
+  out->CreateNtupleDColumn("front_phi_az_rad");
+  out->CreateNtupleDColumn("rear_phi_az_rad");
   out->FinishNtuple();
 }
 

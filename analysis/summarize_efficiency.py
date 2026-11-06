@@ -47,18 +47,12 @@ def main():
         weight = float(event.weight)
         total += weight
         total2 += weight * weight
-        analyzer = int(event.first_analyzer)
-        if analyzer not in (1, 2):
-            continue
-        interactions[analyzer] += weight
-        in_angle = args.theta_min <= event.theta_deg <= args.theta_max
-        has_pair = (
-            bool(event.same_track_front_pair)
-            if analyzer == 1
-            else bool(event.same_track_rear_pair)
-        )
-        if in_angle and has_pair:
-            selected[analyzer] += weight
+        if event.first_analyzer in (1, 2):
+            interactions[int(event.first_analyzer)] += weight
+        if event.front_track_valid and args.theta_min <= event.front_track_theta_deg <= args.theta_max:
+            selected[1] += weight
+        if event.rear_track_valid and args.theta_min <= event.rear_track_theta_deg <= args.theta_max:
+            selected[2] += weight
 
     print(f"input_weight {total:.9g}")
     print(f"theta_range_deg {args.theta_min:g} {args.theta_max:g}")

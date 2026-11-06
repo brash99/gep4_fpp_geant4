@@ -46,8 +46,11 @@ void SteppingAction::UserSteppingAction(const G4Step* step) {
   const std::string postName = postVolume->GetName();
   for (int chamber = 1; chamber <= 4; ++chamber) {
     if (postName == "FPP" + std::to_string(chamber)) {
-      eventAction_->recordChamberCrossing(chamber, track->GetTrackID(),
-                                          track->GetParentID() == 0);
+      eventAction_->recordChamberCrossing(
+          chamber, track->GetTrackID(), track->GetParentID(),
+          track->GetParentID() == 0, post->GetMomentumDirection(),
+          post->GetPosition() / cm,
+          post->GetMomentum().mag() / GeV);
     }
   }
 }

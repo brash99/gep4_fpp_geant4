@@ -37,13 +37,10 @@ def main():
             elastic.Fill(theta, weight)
         elif event.process_category == 2:
             inelastic.Fill(theta, weight)
-        has_pair = (
-            bool(event.same_track_front_pair)
-            if event.first_analyzer == 1
-            else bool(event.same_track_rear_pair)
-        )
-        if has_pair:
-            accepted.Fill(theta, weight)
+        if event.front_track_valid:
+            accepted.Fill(float(event.front_track_theta_deg), weight)
+        if event.rear_track_valid:
+            accepted.Fill(float(event.rear_track_theta_deg), weight)
 
     canvas = ROOT.TCanvas("canvas", "canvas", 900, 700)
     all_interactions.SetTitle("6.7 GeV/c proton interactions in GEp-III FPP geometry;scattering angle (deg);weighted events / 0.5 deg")
@@ -64,7 +61,7 @@ def main():
     legend.AddEntry(all_interactions, "all first hadronic interactions", "l")
     legend.AddEntry(elastic, "hadronic elastic", "l")
     legend.AddEntry(inelastic, "hadronic inelastic", "l")
-    legend.AddEntry(accepted, "same-track chamber pair", "l")
+    legend.AddEntry(accepted, "reconstructed chamber-pair tracks", "l")
     legend.Draw()
     canvas.SaveAs(args.output_stem + ".pdf")
     canvas.SaveAs(args.output_stem + ".png")

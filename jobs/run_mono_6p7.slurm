@@ -33,3 +33,6 @@ python3 scripts/generate_mono_sample.py \
 python3 analysis/summarize_efficiency.py \
   "$run_dir/transport.root" --theta-min 5 --theta-max 30 \
   > "$run_dir/efficiency_5_30deg.txt"
+
+python3 analysis/plot_theta_vs_zclose.py \
+  "$run_dir/transport.root" "$run_dir/theta_vs_zclose"

@@ -24,9 +24,14 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* geantEvent) {
   const auto& event = reader_->event(index);
   const double p = std::sqrt(event.pxGeV * event.pxGeV + event.pyGeV * event.pyGeV +
                              event.pzGeV * event.pzGeV);
-  gun_->SetParticlePosition({event.xCm * cm, event.yCm * cm, event.zCm * cm});
-  gun_->SetParticleMomentumDirection({event.pxGeV, event.pyGeV, event.pzGeV});
-  gun_->SetParticleMomentum(p * GeV);
-  eventAction_->setInput(event.eventId, event.weight, p);
+  const G4ThreeVector positionCm(event.xCm, event.yCm, event.zCm);
+  gun_->SetParticlePosition(positionCm * cm);
+  const G4ThreeVector direction(event.pxGeV, event.pyGeV, event.pzGeV);
+  gun_->SetParticleMomentumDirection(direction);
+  const double massGeV = gun_->GetParticleDefinition()->GetPDGMass() / GeV;
+  const double kineticEnergyGeV = std::sqrt(p * p + massGeV * massGeV) - massGeV;
+  gun_->SetParticleEnergy(kineticEnergyGeV * GeV);
+  eventAction_->setInput(event.eventId, event.weight, p, positionCm,
+                         direction.unit());
   gun_->GeneratePrimaryVertex(geantEvent);
 }

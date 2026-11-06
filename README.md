@@ -68,6 +68,22 @@ The reported statistical uncertainty is only a weighted-sample diagnostic.
 Hadronic-model, geometry, reconstruction, and analyzing-power uncertainties
 must be evaluated separately.
 
+The primary reconstruction diagnostic is the two-dimensional distribution of
+polar scattering angle versus the z coordinate of closest approach of the
+upstream and downstream tracks:
+
+```bash
+python3 analysis/plot_theta_vs_zclose.py output.root theta_vs_zclose
+```
+
+The plot marks the physical z boundaries of each CH2 analyzer. This is the
+direct analogue of the central GEp-III FPP reconstruction diagnostic.
+The same command also writes a companion canvas containing
+`theta_polar` versus `s_close` and the accepted-event azimuthal distributions
+for both analyzers. The azimuth follows the legacy GEp-III convention:
+`atan2(delta horizontal slope, delta vertical slope)`, stored in radians and
+wrapped onto `[0, 2 pi)`.
+
 ## Monoenergetic validation sample
 
 Generate a deterministic central-ray sample with:
