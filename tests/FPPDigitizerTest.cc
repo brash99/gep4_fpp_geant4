@@ -137,6 +137,22 @@ int main() {
   require(leftRight.signedDriftCm.size() == angledHits.size(),
           "one selected signed drift per input hit");
 
+  // The four-chamber lever arm must resolve a small projected angle using all
+  // twelve U/X/V measurements.  This is the topology needed below 5 degrees.
+  const FPPVector3 smallAnglePoint{-7.08, -1.0, 0.0};
+  const FPPVector3 smallAngleDirection{0.012, 0.006, 1.0};
+  const auto allFourHits =
+      digitizeFPPTrack(smallAnglePoint, smallAngleDirection, 0xf);
+  const auto allFourFit = fitFPPLeftRightPermutations(allFourHits);
+  require(allFourFit.track.valid && allFourFit.permutationsTried == 4096,
+          "twelve hits must exercise all 4096 left/right permutations");
+  requireClose(allFourFit.track.slopeX, 0.012, 2.0e-3,
+               "four-chamber small-angle x slope");
+  requireClose(allFourFit.track.slopeY, 0.006, 2.0e-3,
+               "four-chamber small-angle y slope");
+  require(allFourFit.track.reducedChi2 < 1.0e-3,
+          "four-chamber small-angle solution chi squared");
+
   std::cout << "FPP geometry and digitizer checks passed\n";
   return 0;
 }

@@ -162,6 +162,58 @@ no chamber inefficiency, resolution smearing, noise, or competing tracks.
 
 ![Idealized two-chamber polar- and azimuthal-angle reconstruction closure](plots/single_55p88cm_two_chamber_reco_closure.png)
 
+## Small-angle four-chamber closure and first FOM
+
+The single-analyzer configuration also performs a twelve-plane fit using all
+four U/X/V chamber triplets.  This is the relevant topology for GEp-4 because
+the GEp-III high-energy analyzing-power parameterization uses
+`0.07 < pT < 1.0 GeV/c`, corresponding to approximately 0.6--8.6 degrees at
+6.7 GeV/c.  The earlier 5-degree lower cut therefore discarded most of the
+useful polarimetry.
+
+In the first 100,000-event, 55.88-cm sample, all 59,113 truth-selected events
+from 0--10 degrees were fit.  The polar-angle RMS rises from 0.000003 degrees
+below 0.5 degrees to 0.0021 degrees in the 7--10 degree bin; no event has a
+polar error above 0.5 degrees or an azimuthal error above 30 degrees.  This is
+an ideal closure result: hits are truth-associated and have exact drift
+distances, with no chamber inefficiency, resolution smearing, noise, or
+competing tracks.
+
+[PDF: idealized four-chamber small-angle reconstruction closure](plots/single_55p88cm_four_chamber_reco_closure.pdf)
+
+![Idealized four-chamber small-angle reconstruction closure](plots/single_55p88cm_four_chamber_reco_closure.png)
+
+The first intrinsic FOM calculation uses the GEp-III/SBS parameterization
+
+`Ay = (0.124207234 + 1.26386308/p) pT exp(-2.42614689 pT^2)`
+
+with momenta in GeV/c.  For the monoenergetic 6.7 GeV/c sample, the 55.88-cm
+analyzer and the hybrid topology give a useful-pT efficiency of 26.264%, an
+RMS effective analyzing power of 0.06311 within the useful-pT sample, and an
+intrinsic FOM per incident proton of 0.001046.  The lower-angle-cut dependence
+is:
+
+| minimum theta | intrinsic FOM | fraction retained | projected component sigma |
+|---:|---:|---:|---:|
+| 0 degrees | 0.001046 | 100.0% | 0.01573 |
+| 1 degree | 0.001018 | 97.3% | 0.01595 |
+| 2 degrees | 0.000877 | 83.8% | 0.01719 |
+| 3 degrees | 0.000686 | 65.6% | 0.01943 |
+| 4 degrees | 0.000459 | 43.9% | 0.02374 |
+| 5 degrees | 0.000255 | 24.3% | 0.03189 |
+
+The projected component uncertainties assume 10.69 million protons incident
+on the analyzer and 85% beam polarization, and are not yet form-factor-ratio
+uncertainties.  Approximately 76% of the intrinsic FOM is below 5 degrees,
+whereas imposing a practical 1-degree lower cut loses only 2.7%.  Detector
+resolution, inefficiency, noise, pattern recognition, and the event-by-event
+GEp-4 momentum distribution remain to be incorporated before treating these
+as proposal projections.
+
+[PDF: accepted yield, Ay weighting, and cumulative FOM](plots/single_55p88cm_fom.pdf)
+
+![Accepted yield, Ay weighting, and cumulative FOM](plots/single_55p88cm_fom.png)
+
 The `fpp_digitizer` test compares representative coordinates directly with
 the legacy `get_wire_numbers` convention before this information is used by
 the reconstruction layer.

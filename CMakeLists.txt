@@ -18,6 +18,8 @@ configure_file(data/example_events.csv data/example_events.csv COPYONLY)
 
 include(CTest)
 if(BUILD_TESTING)
+  find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
   add_test(NAME smoke
     COMMAND gep4_fpp_sim macros/run_example.mac data/example_events.csv smoke.root)
   set_tests_properties(smoke PROPERTIES TIMEOUT 120)
@@ -28,4 +30,7 @@ if(BUILD_TESTING)
     src/FPPTrackFit.cc)
   target_include_directories(fpp_digitizer_test PRIVATE include)
   add_test(NAME fpp_digitizer COMMAND fpp_digitizer_test)
+
+  add_test(NAME analyzing_power
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_calculate_fom.py)
 endif()

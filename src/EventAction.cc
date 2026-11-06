@@ -18,9 +18,9 @@ constexpr double kFpp4ZCm = 297.198;
 }  // namespace
 
 void EventAction::BeginOfEventAction(const G4Event*) {
-  eventId_ = -1;
-  weight_ = 1.0;
-  momentumGeV_ = 0.0;
+  // GeneratePrimaries supplies the input event before Geant4 invokes this
+  // callback.  Preserve those fields here; resetting them made event_id,
+  // weight, and incident_p_GeV identically default-valued in the output.
   analyzer_ = 0;
   processCategory_ = 0;
   interactionZCm_ = 0.0;
@@ -136,13 +136,14 @@ EventAction::Candidate EventAction::bestCandidate(int analyzer) const {
     double reconstructedPhi = 0.0;
     double reconstructedChi2 = 0.0;
     int reconstructionPermutations = 0;
-    if (analyzer == 1) {
+    if (analyzer == 1 || analyzer == 3) {
       const FPPVector3 digitizerPoint{outgoingPoint.x(), outgoingPoint.y(),
                                       outgoingPoint.z()};
       const FPPVector3 digitizerDirection{outgoing.x(), outgoing.y(),
                                           outgoing.z()};
-      const auto hits =
-          digitizeFPPTrack(digitizerPoint, digitizerDirection, 0x3);
+      const int chamberMask = analyzer == 3 ? 0xf : 0x3;
+      const auto hits = digitizeFPPTrack(digitizerPoint, digitizerDirection,
+                                         chamberMask);
       const auto reconstructed = fitFPPLeftRightPermutations(hits);
       if (reconstructed.track.valid) {
         const G4ThreeVector reconstructedDirection{
@@ -260,5 +261,10 @@ void EventAction::EndOfEventAction(const G4Event*) {
   out->FillNtupleDColumn(36, front.reconstructedPhiRad);
   out->FillNtupleDColumn(37, front.reconstructedReducedChi2);
   out->FillNtupleIColumn(38, front.reconstructionPermutations);
+  out->FillNtupleIColumn(39, allFour.reconstructedValid ? 1 : 0);
+  out->FillNtupleDColumn(40, allFour.reconstructedThetaDeg);
+  out->FillNtupleDColumn(41, allFour.reconstructedPhiRad);
+  out->FillNtupleDColumn(42, allFour.reconstructedReducedChi2);
+  out->FillNtupleIColumn(43, allFour.reconstructionPermutations);
   out->AddNtupleRow();
 }

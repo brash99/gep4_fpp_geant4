@@ -45,6 +45,11 @@ RunAction::RunAction(std::string outputPath) : outputPath_(std::move(outputPath)
   out->CreateNtupleDColumn("front_reco_phi_az_rad");
   out->CreateNtupleDColumn("front_reco_reduced_chi2");
   out->CreateNtupleIColumn("front_reco_permutations");
+  out->CreateNtupleIColumn("all4_reco_valid");
+  out->CreateNtupleDColumn("all4_reco_theta_deg");
+  out->CreateNtupleDColumn("all4_reco_phi_az_rad");
+  out->CreateNtupleDColumn("all4_reco_reduced_chi2");
+  out->CreateNtupleIColumn("all4_reco_permutations");
   out->FinishNtuple();
 }
 
