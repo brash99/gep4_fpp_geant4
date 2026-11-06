@@ -1,5 +1,8 @@
 #include "EventAction.hh"
 
+#include "FPPGeometry.hh"
+#include "FPPTrackFit.hh"
+
 #include "G4AnalysisManager.hh"
 #include "G4SystemOfUnits.hh"
 
@@ -128,6 +131,40 @@ EventAction::Candidate EventAction::bestCandidate(int analyzer) const {
     const bool conePass =
         legacyConeTest(incomingPoint, incoming, theta, rearPlaneZ);
 
+    bool reconstructedValid = false;
+    double reconstructedTheta = 0.0;
+    double reconstructedPhi = 0.0;
+    double reconstructedChi2 = 0.0;
+    int reconstructionPermutations = 0;
+    if (analyzer == 1) {
+      const FPPVector3 digitizerPoint{outgoingPoint.x(), outgoingPoint.y(),
+                                      outgoingPoint.z()};
+      const FPPVector3 digitizerDirection{outgoing.x(), outgoing.y(),
+                                          outgoing.z()};
+      const auto hits =
+          digitizeFPPTrack(digitizerPoint, digitizerDirection, 0x3);
+      const auto reconstructed = fitFPPLeftRightPermutations(hits);
+      if (reconstructed.track.valid) {
+        const G4ThreeVector reconstructedDirection{
+            reconstructed.track.slopeX, reconstructed.track.slopeY, 1.0};
+        const double reconstructedCosine =
+            std::clamp(incoming.unit().dot(reconstructedDirection.unit()),
+                       -1.0, 1.0);
+        reconstructedTheta = std::acos(reconstructedCosine) / deg;
+        const double reconstructedDeltaX =
+            reconstructed.track.slopeX - incoming.x() / incoming.z();
+        const double reconstructedDeltaY =
+            reconstructed.track.slopeY - incoming.y() / incoming.z();
+        reconstructedPhi =
+            std::atan2(reconstructedDeltaX, reconstructedDeltaY);
+        if (reconstructedPhi < 0.0) reconstructedPhi += 2.0 * CLHEP::pi;
+        reconstructedValid = true;
+        reconstructedChi2 = reconstructed.track.reducedChi2;
+        reconstructionPermutations =
+            static_cast<int>(reconstructed.permutationsTried);
+      }
+    }
+
     double zClose = 0.0;
     double sClose = 0.0;
     const auto u = incoming.unit();
@@ -150,7 +187,18 @@ EventAction::Candidate EventAction::bestCandidate(int analyzer) const {
     // Use the leading reconstructible charged track when multiple tracks
     // cross the same chamber pair.
     if (!best.valid || momentum > best.momentumGeV) {
-      best = {true, conePass, theta, phi, momentum, zClose, sClose};
+      best.valid = true;
+      best.conePass = conePass;
+      best.thetaDeg = theta;
+      best.phiRad = phi;
+      best.momentumGeV = momentum;
+      best.zCloseCm = zClose;
+      best.sCloseCm = sClose;
+      best.reconstructedValid = reconstructedValid;
+      best.reconstructedThetaDeg = reconstructedTheta;
+      best.reconstructedPhiRad = reconstructedPhi;
+      best.reconstructedReducedChi2 = reconstructedChi2;
+      best.reconstructionPermutations = reconstructionPermutations;
     }
   }
   return best;
@@ -207,5 +255,10 @@ void EventAction::EndOfEventAction(const G4Event*) {
                              ? 1
                              : 0);
   out->FillNtupleIColumn(33, front.valid && front.conePass ? 1 : 0);
+  out->FillNtupleIColumn(34, front.reconstructedValid ? 1 : 0);
+  out->FillNtupleDColumn(35, front.reconstructedThetaDeg);
+  out->FillNtupleDColumn(36, front.reconstructedPhiRad);
+  out->FillNtupleDColumn(37, front.reconstructedReducedChi2);
+  out->FillNtupleIColumn(38, front.reconstructionPermutations);
   out->AddNtupleRow();
 }

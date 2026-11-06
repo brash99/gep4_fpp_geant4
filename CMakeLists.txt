@@ -21,4 +21,11 @@ if(BUILD_TESTING)
   add_test(NAME smoke
     COMMAND gep4_fpp_sim macros/run_example.mac data/example_events.csv smoke.root)
   set_tests_properties(smoke PROPERTIES TIMEOUT 120)
+
+  add_executable(fpp_digitizer_test
+    tests/FPPDigitizerTest.cc
+    src/FPPGeometry.cc
+    src/FPPTrackFit.cc)
+  target_include_directories(fpp_digitizer_test PRIVATE include)
+  add_test(NAME fpp_digitizer COMMAND fpp_digitizer_test)
 endif()

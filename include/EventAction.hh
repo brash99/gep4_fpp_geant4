@@ -44,6 +44,11 @@ class EventAction final : public G4UserEventAction {
     double momentumGeV = 0.0;
     double zCloseCm = 0.0;
     double sCloseCm = 0.0;
+    bool reconstructedValid = false;
+    double reconstructedThetaDeg = 0.0;
+    double reconstructedPhiRad = 0.0;
+    double reconstructedReducedChi2 = 0.0;
+    int reconstructionPermutations = 0;
   };
 
   Candidate bestCandidate(int analyzer) const;

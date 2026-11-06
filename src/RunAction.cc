@@ -40,6 +40,11 @@ RunAction::RunAction(std::string outputPath) : outputPath_(std::move(outputPath)
   out->CreateNtupleDColumn("single_all4_sclose_cm");
   out->CreateNtupleIColumn("single_all4_cone_pass");
   out->CreateNtupleIColumn("front_cone_pass");
+  out->CreateNtupleIColumn("front_reco_valid");
+  out->CreateNtupleDColumn("front_reco_theta_deg");
+  out->CreateNtupleDColumn("front_reco_phi_az_rad");
+  out->CreateNtupleDColumn("front_reco_reduced_chi2");
+  out->CreateNtupleIColumn("front_reco_permutations");
   out->FinishNtuple();
 }
 

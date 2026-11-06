@@ -114,6 +114,58 @@ wire-level reconstruction study.  Pass `--no-cone-test` to
 `analysis/summarize_single_analyzer.py` only when reproducing the earlier
 geometry-only numbers.
 
+## Hall C chamber digitization
+
+`FPPGeometry` contains the authoritative twelve-plane Hall C GEp-III chamber
+layout from `Analyzer/replay/PARAM/hfpp.param`: four chambers with U/X/V
+measurement planes, one-based 104/83/104 wire numbering, 2 cm pitch, and the
+measured layer z positions. `digitizeFPPLine` maps a straight truth trajectory
+to the nearest legacy wire and its unsigned three-dimensional distance of
+closest approach. This is deliberately an analytical digitizer; individual
+physical wires are not constructed in GEANT4.
+
+`digitizeFPPTrack` produces the reconstruction-facing hit representation:
+plane identity, one-based wire number, and unsigned drift distance only. It
+does not retain the truth crossing coordinate or the drift sign. Chamber masks
+permit the first six-plane pair, rear six-plane pair, or all twelve planes to
+be formed with the same digitizer.
+
+`fitFPPWireCenters` implements the next historical reconstruction stage: a
+simultaneous four-parameter straight-line fit to the U/X/V wire centers. It
+requires at least five of the six planes in a chamber pair and preserves the
+legacy rough-fit chi-squared weighting convention. Drift signs and truth
+coordinates are not used in this fit.
+
+`fitFPPLeftRightPermutations` then applies each possible sign combination to
+the unsigned drift distances, refits the straight track, and retains the
+minimum reduced-chi-squared solution. A normal six-plane chamber pair tries
+all 64 permutations. The selected signed drifts remain reconstruction output;
+the truth crossing coordinates are not consulted.
+
+The first reconstruction closure output (`front_reco_*`) is truth-associated:
+GEANT4 identifies the charged particle that crosses FPP1 and FPP2, but the fit
+receives only its six digitized plane IDs, wire numbers, and unsigned drift
+distances. `analysis/analyze_two_chamber_reconstruction_closure.py` compares
+the resulting reconstructed polar and azimuthal angles with truth. In the
+first 100,000-event, 55.88-cm-analyzer sample, all 18,377 truth-selected events
+were fit. The polar-angle RMS is 0.009--0.141 degrees across the 5--19 degree
+bins; the wrapped azimuthal-angle RMS is 0.040--1.142 degrees. The fraction
+with a polar error above 2 degrees or an azimuthal error above 30 degrees is at
+most 0.111% or 0.037%, respectively, in any bin. Thus the idealized six-plane
+fit does not exhibit a large catastrophic left/right branch population,
+including below the proposed 12-degree topology switch. This validates the
+digitizer and fitter but is not yet a full multi-track pattern-recognition
+efficiency measurement: the hits are truth-associated and presently contain
+no chamber inefficiency, resolution smearing, noise, or competing tracks.
+
+[PDF: idealized two-chamber reconstruction closure](plots/single_55p88cm_two_chamber_reco_closure.pdf)
+
+![Idealized two-chamber polar- and azimuthal-angle reconstruction closure](plots/single_55p88cm_two_chamber_reco_closure.png)
+
+The `fpp_digitizer` test compares representative coordinates directly with
+the legacy `get_wire_numbers` convention before this information is used by
+the reconstruction layer.
+
 The analyzer upstream face remains fixed at the GEp-III position. Thicknesses
 up to approximately 60 cm fit before the legacy FPP1 position; larger values
 require an explicit downstream translation of the chamber stack. The initial
