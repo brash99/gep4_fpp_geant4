@@ -95,6 +95,20 @@ python3 analysis/scan_reconstruction_cuts.py output.root \
 The combined efficiency is an event-level union: an event accepted in both
 analyzers is counted only once.
 
+## First 6.7 GeV/c benchmark plots
+
+The initial 100,000-event central-ray benchmark uses the GEp-III baseline
+geometry and `FTFP_BERT`. These are transport and reconstruction diagnostics,
+not yet data-validated FOM predictions.
+
+[PDF: polar angle versus z_close](plots/mono_6p7_theta_vs_zclose.pdf)
+
+![Polar scattering angle versus z_close for both analyzers](plots/mono_6p7_theta_vs_zclose.png)
+
+[PDF: s_close and phi_az diagnostics](plots/mono_6p7_theta_vs_zclose_sclose_phi.pdf)
+
+![s_close and phi_az diagnostics for both analyzers](plots/mono_6p7_theta_vs_zclose_sclose_phi.png)
+
 ## Monoenergetic validation sample
 
 Generate a deterministic central-ray sample with:
