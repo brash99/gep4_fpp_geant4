@@ -84,6 +84,17 @@ for both analyzers. The azimuth follows the legacy GEp-III convention:
 `atan2(delta horizontal slope, delta vertical slope)`, stored in radians and
 wrapped onto `[0, 2 pi)`.
 
+Scan the geometry-level efficiency after requiring `z_close` to lie inside
+the corresponding analyzer and varying the `s_close` requirement with:
+
+```bash
+python3 analysis/scan_reconstruction_cuts.py output.root \
+  --theta-min 5 --theta-max 30
+```
+
+The combined efficiency is an event-level union: an event accepted in both
+analyzers is counted only once.
+
 ## Monoenergetic validation sample
 
 Generate a deterministic central-ray sample with:
