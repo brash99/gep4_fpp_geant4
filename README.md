@@ -210,6 +210,19 @@ resolution, inefficiency, noise, pattern recognition, and the event-by-event
 GEp-4 momentum distribution remain to be incorporated before treating these
 as proposal projections.
 
+The 10.69-million-event result is a pre-NPS-response upper bound.  Applying
+the current provisional NPS signal retention gives 7.5--7.7 million incident
+events, an integrated beam-polarization-weighted FOM of approximately
+5,670--5,820, and a component uncertainty of approximately 0.0188--0.0185.
+For comparison, Andrew Puckett's approximately 9.3-million-event SBS best-case
+planning sample, combined with the conservative 20% useful FPP efficiency and
+the same effective analyzing power and beam polarization, gives approximately
+5,350 and 0.0193.  The present response-reduced Hall C result is therefore
+only 6--9% higher in FOM.  Because the SBS efficiency is an effective
+reconstructed quantity while the Hall C result is still truth-associated,
+this should be described as comparable and possibly modestly better, not yet
+as a demonstrated precision advantage.
+
 [PDF: accepted yield, Ay weighting, and cumulative FOM](plots/single_55p88cm_fom.pdf)
 
 ![Accepted yield, Ay weighting, and cumulative FOM](plots/single_55p88cm_fom.png)
