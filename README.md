@@ -110,6 +110,25 @@ up to approximately 60 cm fit before the legacy FPP1 position; larger values
 require an explicit downstream translation of the chamber stack. The initial
 scan covers 40, 50, 55.88, and 60 cm.
 
+For 6.7 GeV/c central-ray protons, requiring all four chambers,
+`5 < theta_polar < 30 deg`, `z_close` inside the analyzer, and
+`s_close < 1 cm` gives:
+
+| CH2 thickness | Geometry-level efficiency |
+|---:|---:|
+| 40 cm | 21.32% |
+| 50 cm | 24.20% |
+| 55.88 cm | 25.11% |
+| 60 cm | 25.92% |
+
+[PDF: single-analyzer efficiency versus thickness](plots/single_analyzer_scan_efficiency.pdf)
+
+![Single-analyzer efficiency versus thickness](plots/single_analyzer_scan_efficiency.png)
+
+[PDF: 40 and 60 cm theta_polar versus z_close](plots/single_analyzer_scan_theta_zclose.pdf)
+
+![40 and 60 cm theta_polar versus z_close](plots/single_analyzer_scan_theta_zclose.png)
+
 ## First 6.7 GeV/c benchmark plots
 
 The initial 100,000-event central-ray benchmark uses the GEp-III baseline
