@@ -15,28 +15,47 @@
 #include <string>
 
 int main(int argc, char** argv) {
-  if (argc < 4 || argc > 5) {
+  if (argc < 4) {
     std::cerr << "Usage: " << argv[0]
-              << " run.mac events.csv output.root [physics_list]\n";
+              << " run.mac events.csv output.root [physics_list]"
+                 " [--physics LIST] [--single-analyzer]"
+                 " [--analyzer-thickness-cm VALUE]\n";
     return 2;
   }
 
   try {
-    const std::string physicsName = argc == 5 ? argv[4] : "FTFP_BERT";
+    std::string physicsName = "FTFP_BERT";
+    bool singleAnalyzer = false;
+    double analyzerThicknessCm = 55.88;
+    for (int i = 4; i < argc; ++i) {
+      const std::string argument = argv[i];
+      if (argument == "--single-analyzer") {
+        singleAnalyzer = true;
+      } else if (argument == "--physics" && i + 1 < argc) {
+        physicsName = argv[++i];
+      } else if (argument == "--analyzer-thickness-cm" && i + 1 < argc) {
+        analyzerThicknessCm = std::stod(argv[++i]);
+      } else if (argument.rfind("--", 0) != 0 && i == 4) {
+        physicsName = argument;  // Backward-compatible positional physics list.
+      } else {
+        throw std::runtime_error("Unknown or incomplete option: " + argument);
+      }
+    }
     auto reader = std::make_shared<FPPEventReader>(argv[2]);
     // Keep the first validation implementation deterministic.  The shared
     // event reader and output schema can be made thread-local after the
     // single-thread physics path has been validated.
     auto* runManager =
         G4RunManagerFactory::CreateRunManager(G4RunManagerType::Serial);
-    runManager->SetUserInitialization(new DetectorConstruction());
+    runManager->SetUserInitialization(
+        new DetectorConstruction(analyzerThicknessCm, !singleAnalyzer));
 
     G4PhysListFactory factory;
     auto* physics = factory.GetReferencePhysList(physicsName);
     if (!physics) throw std::runtime_error("Unknown Geant4 physics list: " + physicsName);
     runManager->SetUserInitialization(physics);
 
-    auto* eventAction = new EventAction();
+    auto* eventAction = new EventAction(singleAnalyzer);
     runManager->SetUserAction(new PrimaryGeneratorAction(reader, eventAction));
     runManager->SetUserAction(new RunAction(argv[3]));
     runManager->SetUserAction(eventAction);

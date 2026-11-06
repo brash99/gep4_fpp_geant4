@@ -95,6 +95,21 @@ python3 analysis/scan_reconstruction_cuts.py output.root \
 The combined efficiency is an event-level union: an event accepted in both
 analyzers is counted only once.
 
+## Single-analyzer mode
+
+Use one analyzer and require the scattered charged track to traverse all four
+FPP chambers with:
+
+```bash
+./build/gep4_fpp_sim run.mac events.csv output.root \
+  --single-analyzer --analyzer-thickness-cm 40
+```
+
+The analyzer upstream face remains fixed at the GEp-III position. Thicknesses
+up to approximately 60 cm fit before the legacy FPP1 position; larger values
+require an explicit downstream translation of the chamber stack. The initial
+scan covers 40, 50, 55.88, and 60 cm.
+
 ## First 6.7 GeV/c benchmark plots
 
 The initial 100,000-event central-ray benchmark uses the GEp-III baseline

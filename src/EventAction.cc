@@ -61,8 +61,8 @@ void EventAction::recordChamberCrossing(int chamber, int trackId, int parentId,
 }
 
 EventAction::Candidate EventAction::bestCandidate(int analyzer) const {
-  const int firstChamber = analyzer == 1 ? 0 : 2;
-  const int requiredMask = analyzer == 1 ? 0x3 : 0xc;
+  const int firstChamber = analyzer == 2 ? 2 : 0;
+  const int requiredMask = analyzer == 1 ? 0x3 : (analyzer == 2 ? 0xc : 0xf);
   Candidate best;
 
   for (const auto& [trackId, track] : tracks_) {
@@ -165,5 +165,12 @@ void EventAction::EndOfEventAction(const G4Event*) {
   out->FillNtupleDColumn(23, rear.sCloseCm);
   out->FillNtupleDColumn(24, front.phiRad);
   out->FillNtupleDColumn(25, rear.phiRad);
+  const auto allFour = bestCandidate(3);
+  out->FillNtupleIColumn(26, singleAnalyzer_ && allFour.valid ? 1 : 0);
+  out->FillNtupleDColumn(27, allFour.thetaDeg);
+  out->FillNtupleDColumn(28, allFour.phiRad);
+  out->FillNtupleDColumn(29, allFour.momentumGeV);
+  out->FillNtupleDColumn(30, allFour.zCloseCm);
+  out->FillNtupleDColumn(31, allFour.sCloseCm);
   out->AddNtupleRow();
 }

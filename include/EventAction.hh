@@ -11,6 +11,8 @@ class G4Event;
 
 class EventAction final : public G4UserEventAction {
  public:
+  explicit EventAction(bool singleAnalyzer = false)
+      : singleAnalyzer_(singleAnalyzer) {}
   void BeginOfEventAction(const G4Event*) override;
   void EndOfEventAction(const G4Event*) override;
 
@@ -59,4 +61,5 @@ class EventAction final : public G4UserEventAction {
   int primaryMask_ = 0;
   int secondaryMask_ = 0;
   std::unordered_map<int, TrackObservation> tracks_;
+  bool singleAnalyzer_ = false;
 };

@@ -32,6 +32,12 @@ RunAction::RunAction(std::string outputPath) : outputPath_(std::move(outputPath)
   out->CreateNtupleDColumn("rear_sclose_cm");
   out->CreateNtupleDColumn("front_phi_az_rad");
   out->CreateNtupleDColumn("rear_phi_az_rad");
+  out->CreateNtupleIColumn("single_all4_valid");
+  out->CreateNtupleDColumn("single_all4_theta_deg");
+  out->CreateNtupleDColumn("single_all4_phi_az_rad");
+  out->CreateNtupleDColumn("single_all4_p_GeV");
+  out->CreateNtupleDColumn("single_all4_zclose_cm");
+  out->CreateNtupleDColumn("single_all4_sclose_cm");
   out->FinishNtuple();
 }
 
