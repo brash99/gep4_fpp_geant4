@@ -21,6 +21,7 @@ def efficiency(tree, thickness):
             and 5.0 <= event.single_all4_theta_deg <= 30.0
             and ZMIN <= event.single_all4_zclose_cm <= ZMIN + thickness
             and event.single_all4_sclose_cm <= 1.0
+            and event.single_all4_cone_pass
         ):
             selected += event.weight
     value = selected / total
@@ -50,13 +51,13 @@ def main():
         graph.SetPoint(index, thickness, value)
         graph.SetPointError(index, 0.0, error)
     graph.SetTitle(
-        "Single-analyzer four-chamber efficiency;CH_{2} thickness (cm);geometry-level efficiency"
+        "Single-analyzer four-chamber efficiency;CH_{2} thickness (cm);truth efficiency with cone test"
     )
     graph.SetMarkerStyle(20)
     graph.SetMarkerSize(1.3)
     graph.SetLineWidth(2)
-    graph.SetMinimum(0.18)
-    graph.SetMaximum(0.28)
+    graph.SetMinimum(0.10)
+    graph.SetMaximum(0.16)
     canvas = ROOT.TCanvas("thickness", "thickness", 850, 650)
     graph.Draw("APL")
     canvas.SaveAs(args.output_stem + "_efficiency.pdf")
@@ -80,7 +81,7 @@ def main():
         hist.SetStats(False)
         sources[tag].Get("fpp").Draw(
             f"single_all4_theta_deg:single_all4_zclose_cm>>{hist.GetName()}",
-            "weight*single_all4_valid",
+            "weight*single_all4_valid*single_all4_cone_pass",
             "colz",
         )
         for boundary in (ZMIN, ZMIN + thickness):

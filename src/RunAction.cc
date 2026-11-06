@@ -38,6 +38,8 @@ RunAction::RunAction(std::string outputPath) : outputPath_(std::move(outputPath)
   out->CreateNtupleDColumn("single_all4_p_GeV");
   out->CreateNtupleDColumn("single_all4_zclose_cm");
   out->CreateNtupleDColumn("single_all4_sclose_cm");
+  out->CreateNtupleIColumn("single_all4_cone_pass");
+  out->CreateNtupleIColumn("front_cone_pass");
   out->FinishNtuple();
 }
 

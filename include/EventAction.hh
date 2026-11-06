@@ -38,6 +38,7 @@ class EventAction final : public G4UserEventAction {
 
   struct Candidate {
     bool valid = false;
+    bool conePass = false;
     double thetaDeg = 0.0;
     double phiRad = 0.0;
     double momentumGeV = 0.0;
@@ -46,6 +47,9 @@ class EventAction final : public G4UserEventAction {
   };
 
   Candidate bestCandidate(int analyzer) const;
+  static bool legacyConeTest(const G4ThreeVector& incomingPointCm,
+                             const G4ThreeVector& incomingDirection,
+                             double thetaDeg, double rearPlaneZCm);
 
   long eventId_ = -1;
   double weight_ = 1.0;

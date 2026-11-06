@@ -6,6 +6,14 @@
 #include <algorithm>
 #include <cmath>
 
+namespace {
+constexpr double kChamberCenterXCm = -5.08;
+constexpr double kChamberHalfXCm = 83.0;
+constexpr double kChamberHalfYCm = 67.0;
+constexpr double kFpp2ZCm = 199.7;
+constexpr double kFpp4ZCm = 297.198;
+}  // namespace
+
 void EventAction::BeginOfEventAction(const G4Event*) {
   eventId_ = -1;
   weight_ = 1.0;
@@ -60,6 +68,25 @@ void EventAction::recordChamberCrossing(int chamber, int trackId, int parentId,
   else secondaryMask_ |= bit;
 }
 
+bool EventAction::legacyConeTest(const G4ThreeVector& incomingPointCm,
+                                 const G4ThreeVector& incomingDirection,
+                                 double thetaDeg, double rearPlaneZCm) {
+  // Port of the GEp-III cone_test acceptance definition.  At fixed polar
+  // scattering angle, require the complete 0--2pi azimuthal cone to remain
+  // inside the rectangular active area of the last required rear chamber.
+  const auto direction = incomingDirection.unit();
+  if (direction.z() <= 0.0) return false;
+  const double pathLengthCm =
+      (rearPlaneZCm - incomingPointCm.z()) / direction.z();
+  if (pathLengthCm <= 0.0) return false;
+  const auto projected = incomingPointCm + pathLengthCm * direction;
+  const double radiusCm = pathLengthCm * std::tan(thetaDeg * deg);
+  return projected.x() - radiusCm >= kChamberCenterXCm - kChamberHalfXCm &&
+         projected.x() + radiusCm <= kChamberCenterXCm + kChamberHalfXCm &&
+         projected.y() - radiusCm >= -kChamberHalfYCm &&
+         projected.y() + radiusCm <= kChamberHalfYCm;
+}
+
 EventAction::Candidate EventAction::bestCandidate(int analyzer) const {
   const int firstChamber = analyzer == 2 ? 2 : 0;
   const int requiredMask = analyzer == 1 ? 0x3 : (analyzer == 2 ? 0xc : 0xf);
@@ -97,6 +124,9 @@ EventAction::Candidate EventAction::bestCandidate(int analyzer) const {
     double phi = std::atan2(deltaX, deltaY);
     if (phi < 0.0) phi += 2.0 * CLHEP::pi;
     const double momentum = track.momentumGeV[firstChamber];
+    const double rearPlaneZ = analyzer == 1 ? kFpp2ZCm : kFpp4ZCm;
+    const bool conePass =
+        legacyConeTest(incomingPoint, incoming, theta, rearPlaneZ);
 
     double zClose = 0.0;
     double sClose = 0.0;
@@ -120,7 +150,7 @@ EventAction::Candidate EventAction::bestCandidate(int analyzer) const {
     // Use the leading reconstructible charged track when multiple tracks
     // cross the same chamber pair.
     if (!best.valid || momentum > best.momentumGeV) {
-      best = {true, theta, phi, momentum, zClose, sClose};
+      best = {true, conePass, theta, phi, momentum, zClose, sClose};
     }
   }
   return best;
@@ -172,5 +202,10 @@ void EventAction::EndOfEventAction(const G4Event*) {
   out->FillNtupleDColumn(29, allFour.momentumGeV);
   out->FillNtupleDColumn(30, allFour.zCloseCm);
   out->FillNtupleDColumn(31, allFour.sCloseCm);
+  out->FillNtupleIColumn(32,
+                         singleAnalyzer_ && allFour.valid && allFour.conePass
+                             ? 1
+                             : 0);
+  out->FillNtupleIColumn(33, front.valid && front.conePass ? 1 : 0);
   out->AddNtupleRow();
 }

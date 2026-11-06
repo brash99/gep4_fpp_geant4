@@ -105,6 +105,15 @@ FPP chambers with:
   --single-analyzer --analyzer-thickness-cm 40
 ```
 
+The single-analyzer truth-efficiency summary applies the historical GEp-III
+cone test by default.  For each accepted polar scattering angle, the complete
+azimuthal cone from 0 to 2pi must fit within the rectangular active area of
+the last required rear chamber.  This makes the truth-level efficiency use
+the same azimuthally symmetric acceptance definition intended for the later
+wire-level reconstruction study.  Pass `--no-cone-test` to
+`analysis/summarize_single_analyzer.py` only when reproducing the earlier
+geometry-only numbers.
+
 The analyzer upstream face remains fixed at the GEp-III position. Thicknesses
 up to approximately 60 cm fit before the legacy FPP1 position; larger values
 require an explicit downstream translation of the chamber stack. The initial
