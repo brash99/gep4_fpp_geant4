@@ -25,9 +25,15 @@ struct FPPLeftRightTrack {
 // default variance preserves that chi-squared convention.
 FPPWireTrack fitFPPWireCenters(const std::vector<FPPPlaneHit>& hits,
                                double varianceCm2 = 2.0);
+FPPWireTrack fitFPPWireCenters(const std::vector<FPPPlaneHit>& hits,
+                               const FPPPlaneArray& planes,
+                               double varianceCm2 = 2.0);
 
 // Try both signs of every unsigned drift distance and retain the track with
 // minimum reduced chi squared.  The default 0.005 cm^2 is the numerical Hall C
 // HFPP_resolution value used by the legacy left/right fit.
 FPPLeftRightTrack fitFPPLeftRightPermutations(
     const std::vector<FPPPlaneHit>& hits, double varianceCm2 = 0.005);
+FPPLeftRightTrack fitFPPLeftRightPermutations(
+    const std::vector<FPPPlaneHit>& hits, const FPPPlaneArray& planes,
+    double varianceCm2 = 0.005);

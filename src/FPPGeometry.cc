@@ -56,10 +56,49 @@ double magnitude(const FPPVector3& value) {
 }
 }  // namespace
 
-const std::array<FPPPlane, 12>& hallCFPPPlanes() {
+const FPPLayout& legacyFPPLayout() {
+  static const FPPLayout layout{{178.4, 199.7, 275.898, 297.198}};
+  return layout;
+}
+
+const FPPLayout& compactDownstreamFPPLayout() {
+  // Remove Analyzer 2, retain the historical FPP3/FPP4 locations, and move
+  // FPP1/FPP2 downstream with the historical 21.3 cm chamber-pair pitch.
+  static const FPPLayout layout{{233.298, 254.598, 275.898, 297.198}};
+  return layout;
+}
+
+FPPPlaneArray makeHallCFPPPlanes(const FPPLayout& layout) {
   // Hall C GEp-III values from Analyzer/replay/PARAM/hfpp.param.  The array
-  // is ordered by physical chamber, then U/X/V measurement plane.
-  static const std::array<FPPPlane, 12> planes = {
+  // is ordered by physical chamber, then U/X/V measurement plane.  The small
+  // legacy offsets of the plane coordinates from their Geant4 chamber-volume
+  // centers are preserved exactly, so the default layout is regression-safe.
+  if (layout.chamberCenterZCm == legacyFPPLayout().chamberCenterZCm) {
+    return hallCFPPPlanes();
+  }
+  constexpr std::array<std::array<double, 3>, 4> offsets = {{
+      {{-1.6, 0.0, 1.6}},
+      {{-1.6, 0.0, 1.6}},
+      {{-1.598, 0.002, 1.602}},
+      {{-1.598, 0.102, 1.602}},
+  }};
+  FPPPlaneArray planes;
+  for (int chamber = 0; chamber < 4; ++chamber) {
+    planes[3 * chamber] = makePlane(
+        chamber + 1, FPPPlaneOrientation::U,
+        layout.chamberCenterZCm[chamber] + offsets[chamber][0]);
+    planes[3 * chamber + 1] = makePlane(
+        chamber + 1, FPPPlaneOrientation::X,
+        layout.chamberCenterZCm[chamber] + offsets[chamber][1]);
+    planes[3 * chamber + 2] = makePlane(
+        chamber + 1, FPPPlaneOrientation::V,
+        layout.chamberCenterZCm[chamber] + offsets[chamber][2]);
+  }
+  return planes;
+}
+
+const FPPPlaneArray& hallCFPPPlanes() {
+  static const FPPPlaneArray planes = {
       makePlane(1, FPPPlaneOrientation::U, 176.8),
       makePlane(1, FPPPlaneOrientation::X, 178.4),
       makePlane(1, FPPPlaneOrientation::V, 180.0),
@@ -130,8 +169,14 @@ FPPDigitizedHit digitizeFPPLine(const FPPPlane& plane,
 std::vector<FPPPlaneHit> digitizeFPPTrack(const FPPVector3& pointCm,
                                           const FPPVector3& direction,
                                           int chamberMask) {
+  return digitizeFPPTrack(pointCm, direction, hallCFPPPlanes(), chamberMask);
+}
+
+std::vector<FPPPlaneHit> digitizeFPPTrack(const FPPVector3& pointCm,
+                                          const FPPVector3& direction,
+                                          const FPPPlaneArray& planes,
+                                          int chamberMask) {
   std::vector<FPPPlaneHit> hits;
-  const auto& planes = hallCFPPPlanes();
   hits.reserve(planes.size());
   for (std::size_t index = 0; index < planes.size(); ++index) {
     const auto& plane = planes[index];

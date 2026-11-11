@@ -16,7 +16,7 @@ idealized FPP tracking planes.
 
 ## Current scope
 
-- GEp-III baseline geometry with two 55.88 cm CH2 analyzers.
+- GEp-III baseline geometry with two legacy 22-inch (55.88 cm) CH2 analyzers.
 - CSV input for weighted proton phase space.
 - `FTFP_BERT` hadronic physics by default.
 - Idealized FPP tracking planes.
@@ -235,6 +235,14 @@ The analyzer upstream face remains fixed at the GEp-III position. Thicknesses
 up to approximately 60 cm fit before the legacy FPP1 position; larger values
 require an explicit downstream translation of the chamber stack. The initial
 scan covers 40, 50, 55.88, and 60 cm.
+
+The exact 55.88 cm value is the metric representation of the legacy 22-inch
+analyzer module, not the result of optimizing the GEp-4 FOM.  The ported
+coordinates provide 61.38 cm from the analyzer upstream face to the nominal
+FPP1 entrance, leaving about 5.50 cm beyond the polyethylene for clearance and
+frame structure.  The 60 cm scan point is therefore a simplified-geometry
+sensitivity study; compatibility with the constructed analyzer frame has not
+yet been established.
 
 For 6.7 GeV/c central-ray protons, requiring all four chambers,
 `5 < theta_polar < 30 deg`, `z_close` inside the analyzer, and

@@ -22,7 +22,9 @@ void placeBox(const char* name, G4Material* material, G4LogicalVolume* world,
 
 G4VPhysicalVolume* DetectorConstruction::Construct() {
   constexpr double analyzer1UpstreamFaceCm = 111.4215;
-  constexpr double fpp1UpstreamFaceCm = 172.8;
+  constexpr double chamberStructureUpstreamOffsetCm = 5.6;
+  const double fpp1UpstreamFaceCm =
+      layout_.chamberCenterZCm[0] - chamberStructureUpstreamOffsetCm;
   if (analyzer1ThicknessCm_ <= 0.0 ||
       analyzer1UpstreamFaceCm + analyzer1ThicknessCm_ >= fpp1UpstreamFaceCm) {
     throw std::runtime_error(
@@ -44,14 +46,18 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
   placeBox("Analyzer1", polyethylene, worldLogical, 71.12, 53.975,
            analyzer1ThicknessCm_ / 2.0, -5.08,
            analyzer1UpstreamFaceCm + analyzer1ThicknessCm_ / 2.0);
-  placeBox("FPP1", air, worldLogical, 83.0, 67.0, 0.05, -5.08, 178.4);
-  placeBox("FPP2", air, worldLogical, 83.0, 67.0, 0.05, -5.08, 199.7);
+  placeBox("FPP1", air, worldLogical, 83.0, 67.0, 0.05, -5.08,
+           layout_.chamberCenterZCm[0]);
+  placeBox("FPP2", air, worldLogical, 83.0, 67.0, 0.05, -5.08,
+           layout_.chamberCenterZCm[1]);
   if (includeAnalyzer2_) {
     placeBox("Analyzer2", polyethylene, worldLogical, 71.12, 53.975, 27.94,
              -5.08, 237.694);
   }
-  placeBox("FPP3", air, worldLogical, 83.0, 67.0, 0.05, -5.08, 275.898);
-  placeBox("FPP4", air, worldLogical, 83.0, 67.0, 0.05, -5.08, 297.198);
+  placeBox("FPP3", air, worldLogical, 83.0, 67.0, 0.05, -5.08,
+           layout_.chamberCenterZCm[2]);
+  placeBox("FPP4", air, worldLogical, 83.0, 67.0, 0.05, -5.08,
+           layout_.chamberCenterZCm[3]);
 
   return world;
 }

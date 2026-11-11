@@ -38,7 +38,8 @@ bool solve4x4(std::array<std::array<double, 5>, 4>& augmented,
 
 FPPWireTrack fitCoordinates(const std::vector<FPPPlaneHit>& hits,
                             const std::vector<double>& coordinateOffsetsCm,
-                            double varianceCm2) {
+                            double varianceCm2,
+                            const FPPPlaneArray& planes) {
   FPPWireTrack result;
   result.hitCount = static_cast<int>(hits.size());
   if (hits.size() < 5 || coordinateOffsetsCm.size() != hits.size() ||
@@ -46,7 +47,6 @@ FPPWireTrack fitCoordinates(const std::vector<FPPPlaneHit>& hits,
     return result;
   }
 
-  const auto& planes = hallCFPPPlanes();
   double referenceZ = 0.0;
   for (const auto& hit : hits) {
     if (hit.planeIndex < 0 ||
@@ -124,11 +124,24 @@ FPPWireTrack fitCoordinates(const std::vector<FPPPlaneHit>& hits,
 FPPWireTrack fitFPPWireCenters(const std::vector<FPPPlaneHit>& hits,
                                double varianceCm2) {
   return fitCoordinates(hits, std::vector<double>(hits.size(), 0.0),
-                        varianceCm2);
+                        varianceCm2, hallCFPPPlanes());
+}
+
+FPPWireTrack fitFPPWireCenters(const std::vector<FPPPlaneHit>& hits,
+                               const FPPPlaneArray& planes,
+                               double varianceCm2) {
+  return fitCoordinates(hits, std::vector<double>(hits.size(), 0.0),
+                        varianceCm2, planes);
 }
 
 FPPLeftRightTrack fitFPPLeftRightPermutations(
     const std::vector<FPPPlaneHit>& hits, double varianceCm2) {
+  return fitFPPLeftRightPermutations(hits, hallCFPPPlanes(), varianceCm2);
+}
+
+FPPLeftRightTrack fitFPPLeftRightPermutations(
+    const std::vector<FPPPlaneHit>& hits, const FPPPlaneArray& planes,
+    double varianceCm2) {
   FPPLeftRightTrack best;
   if (hits.size() < 5 || hits.size() > 20 || varianceCm2 <= 0.0) return best;
 
@@ -142,7 +155,8 @@ FPPLeftRightTrack fitFPPLeftRightPermutations(
       const double sign = (permutation & (1UL << index)) ? 1.0 : -1.0;
       signedDrifts[index] = sign * hits[index].driftDistanceCm;
     }
-    const auto candidate = fitCoordinates(hits, signedDrifts, varianceCm2);
+    const auto candidate =
+        fitCoordinates(hits, signedDrifts, varianceCm2, planes);
     if (candidate.valid && candidate.reducedChi2 < bestChi2) {
       bestChi2 = candidate.reducedChi2;
       best.track = candidate;

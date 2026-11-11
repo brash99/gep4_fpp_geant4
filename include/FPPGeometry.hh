@@ -40,7 +40,16 @@ struct FPPPlaneHit {
   double driftDistanceCm = 0.0;    // unsigned; no truth coordinate retained
 };
 
-const std::array<FPPPlane, 12>& hallCFPPPlanes();
+using FPPPlaneArray = std::array<FPPPlane, 12>;
+
+struct FPPLayout {
+  std::array<double, 4> chamberCenterZCm{};
+};
+
+const FPPLayout& legacyFPPLayout();
+const FPPLayout& compactDownstreamFPPLayout();
+FPPPlaneArray makeHallCFPPPlanes(const FPPLayout& layout);
+const FPPPlaneArray& hallCFPPPlanes();
 
 FPPDigitizedHit digitizeFPPLine(const FPPPlane& plane,
                                 const FPPVector3& pointCm,
@@ -48,4 +57,8 @@ FPPDigitizedHit digitizeFPPLine(const FPPPlane& plane,
 
 std::vector<FPPPlaneHit> digitizeFPPTrack(const FPPVector3& pointCm,
                                           const FPPVector3& direction,
+                                          int chamberMask = 0xf);
+std::vector<FPPPlaneHit> digitizeFPPTrack(const FPPVector3& pointCm,
+                                          const FPPVector3& direction,
+                                          const FPPPlaneArray& planes,
                                           int chamberMask = 0xf);

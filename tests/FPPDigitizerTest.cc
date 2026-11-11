@@ -28,6 +28,16 @@ int main() {
   require(planes[11].chamber == 4 && planes[11].zCm == 298.8,
           "last V-plane geometry");
 
+  const auto compactPlanes = makeHallCFPPPlanes(compactDownstreamFPPLayout());
+  requireClose(compactPlanes[0].zCm, 231.698, 1.0e-12,
+               "compact FPP1 U-plane geometry");
+  requireClose(compactPlanes[3].zCm, 252.998, 1.0e-12,
+               "compact FPP2 U-plane geometry");
+  requireClose(compactPlanes[6].zCm, 274.3, 1.0e-12,
+               "compact layout retains FPP3");
+  requireClose(compactPlanes[11].zCm, 298.8, 1.0e-12,
+               "compact layout retains FPP4");
+
   const FPPVector3 forward{0.0, 0.0, 1.0};
   const FPPVector3 chamberCenter{-5.08, 0.0, 0.0};
   for (const auto& plane : planes) {
@@ -152,6 +162,21 @@ int main() {
                "four-chamber small-angle y slope");
   require(allFourFit.track.reducedChi2 < 1.0e-3,
           "four-chamber small-angle solution chi squared");
+
+  const auto compactHits = digitizeFPPTrack(
+      smallAnglePoint, smallAngleDirection, compactPlanes, 0xf);
+  const auto compactFit =
+      fitFPPLeftRightPermutations(compactHits, compactPlanes);
+  require(compactHits.size() == 12,
+          "compact layout must retain all twelve measurements");
+  require(compactFit.track.valid && compactFit.permutationsTried == 4096,
+          "compact twelve-hit track must exercise all permutations");
+  requireClose(compactFit.track.slopeX, 0.012, 2.0e-3,
+               "compact-layout small-angle x slope");
+  requireClose(compactFit.track.slopeY, 0.006, 2.0e-3,
+               "compact-layout small-angle y slope");
+  require(compactFit.track.reducedChi2 < 1.0e-3,
+          "compact-layout small-angle solution chi squared");
 
   std::cout << "FPP geometry and digitizer checks passed\n";
   return 0;
